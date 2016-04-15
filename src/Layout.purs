@@ -1,6 +1,6 @@
 module App.Layout where
 
-import Prelude
+import Prelude ((<$>), ($))
 import App.Game as Game
 import App.Routes (Route(Home, NotFound))
 import Control.Monad.Eff.Random (RANDOM)
@@ -14,25 +14,20 @@ data Action
 
 type State =
   { route :: Route
-  , game :: Game.State }
+  , game :: Game.State
+  }
 
 init :: State
 init =
   { route: NotFound
-  , game: Game.init }
+  , game: Game.init
+  }
 
 update :: forall e. Action -> State -> EffModel State Action (random :: RANDOM | e)
 update (PageView route) state = noEffects $ state { route = route }
-update (Child action) state = mapEffects (\a -> Child a)
-                            $ mapState (\st -> state { game = st })
+update (Child action) state = mapEffects Child
+                            $ mapState (state { game = _ })
                             $ Game.update action state.game
-  -- { state: state
-  -- , effects: [ Game.update action state.game ]
-  -- }
-
--- mapState :: State -> EffModel State Action _
--- mapEffects ::(State -> Game.State) -> EffModel State Action _ -> EffModel Game.State Game.Action _
-
 
 view :: State -> Html Action
 view state =

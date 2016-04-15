@@ -1,6 +1,6 @@
 module App.Game where
 
-import Prelude
+import Prelude (const, show, (++), ($), pure, bind, negate, (+))
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Random (RANDOM, randomInt)
@@ -42,10 +42,12 @@ init =
   }
 
 update :: forall e. Action -> State -> EffModel State Action (random :: RANDOM | e)
+update Reset state = noEffects init
+update UpdateScore state = noEffects $ updateScore state
 update (PlayerMove choice) state =
   { state: state { playerChoice = Just choice }
-  , effects: [ liftEff do
-      computerChoice <- getRandomChoice
+  , effects: [ do
+      computerChoice <- liftEff getRandomChoice
       pure $ ComputerMove computerChoice
     ]
   }
@@ -53,8 +55,6 @@ update (ComputerMove choice) state =
   { state: state { computerChoice = Just choice }
   , effects: [ pure $ UpdateScore ]
   }
-update UpdateScore state = noEffects $ updateScore state
-update Reset state = noEffects init
 
 updateScore :: State -> State
 updateScore state =

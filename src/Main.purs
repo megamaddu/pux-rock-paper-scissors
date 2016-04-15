@@ -6,7 +6,7 @@ import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Random (RANDOM)
 import DOM (DOM)
 import Debug.Trace (traceAny)
-import Prelude (bind, return)
+import Prelude (bind, pure)
 import Pux (App, CoreEffects, renderToDOM, start)
 import Pux.Router (sampleUrl)
 import Signal ((~>))
@@ -36,4 +36,4 @@ main state = do
   renderToDOM "#app" app.html
 
   -- | Used by hot-reloading code in support/index.js
-  return app
+  pure app
