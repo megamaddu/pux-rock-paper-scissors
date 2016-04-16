@@ -1,6 +1,6 @@
 module App.Game where
 
-import Prelude (const, show, (++), ($), pure, bind, negate, (+))
+import Prelude (const, show, (++), ($), (<$>), (<*>), pure, bind, negate, (+))
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Random (RANDOM, randomInt)
@@ -63,14 +63,11 @@ updateScore state =
 
 setGameResult :: State -> State
 setGameResult state =
-  case state.playerChoice, state.computerChoice of
-    Nothing, _ -> state
-    _, Nothing -> state
-    Just player, Just computer ->
-      case determineWinner player computer of
-        PlayerWins -> state { gameResult = Tuple 1 "Player wins!" }
-        ComputerWins -> state { gameResult = Tuple (-1) "Computer wins!" }
-        Tie -> state { gameResult = Tuple 0 "Tie!" }
+  case determineWinner <$> state.playerChoice <*> state.computerChoice of
+    Just PlayerWins -> state { gameResult = Tuple 1 "Player wins!" }
+    Just ComputerWins -> state { gameResult = Tuple (-1) "Computer wins!" }
+    Just Tie -> state { gameResult = Tuple 0 "Tie!" }
+    _ -> state
   where
     determineWinner player computer =
       if didLeftWin player computer
