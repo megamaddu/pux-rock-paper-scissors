@@ -6,14 +6,18 @@ import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Random (RANDOM, randomInt)
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Tuple (snd, fst, Tuple(Tuple))
+import Data.String (toLower)
 import Pux (EffModel, noEffects)
-import Pux.Html (Html, text, button, div)
+import Pux.Html (Html, text, button, div, hr)
+import Pux.Html.Attributes (className)
 import Pux.Html.Events (onClick)
 
 data GameChoice
   = Rock
   | Paper
   | Scissors
+  | Lizard
+  | Spock
 
 data GameResult
   = PlayerWins
@@ -73,25 +77,34 @@ setGameResult state =
         Tie -> state { gameResult = Tuple 0 "Tie!" }
   where
     determineWinner player computer =
-      if didLeftWin player computer
+      if fst (didLeftWin player computer)
         then PlayerWins
-        else if didLeftWin computer player
+        else if fst (didLeftWin computer player)
           then ComputerWins
           else Tie
     didLeftWin left right =
       case left, right of
-        Rock, Scissors -> true
-        Paper, Rock -> true
-        Scissors, Paper -> true
-        _, _ -> false
+        Rock, Scissors -> Tuple true "Rock crushes Scissors"
+        Rock, Lizard -> Tuple true "Rock smashes Lizard"
+        Paper, Rock -> Tuple true "Paper covers Rock"
+        Paper, Spock -> Tuple true "Paper disproves Spock"
+        Scissors, Paper -> Tuple true "Scissors cuts Paper"
+        Scissors, Lizard -> Tuple true "Scissors decapitates Lizard"
+        Lizard, Paper -> Tuple true "Lizard eats Paper"
+        Lizard, Spock -> Tuple true "Lizard poisons Spock"
+        Spock, Rock -> Tuple true "Spock vaporizes Rock"
+        Spock, Scissors -> Tuple true "Spock disassembles Scissors"
+        _, _ -> Tuple false "loss"
 
 getRandomChoice :: forall e. Eff (random :: RANDOM | e) GameChoice
 getRandomChoice = do
-  i <- randomInt 1 3
+  i <- randomInt 1 5
   pure case i of
     1 -> Rock
     2 -> Paper
-    _ -> Scissors
+    3 -> Scissors
+    4 -> Lizard
+    _ -> Spock
 
 printMaybeChoice :: Maybe GameChoice -> String
 printMaybeChoice Nothing = "-- choosing --"
@@ -100,17 +113,23 @@ printMaybeChoice (Just choice) = printChoice choice
     printChoice Rock = "Rock"
     printChoice Paper = "Paper"
     printChoice Scissors = "Scissors"
+    printChoice Lizard = "Lizard"
+    printChoice Spock = "Spock"
 
 view :: State -> Html Action
 view state =
   div
     []
-    [ button [ onClick (const $ PlayerMove Rock) ] [ text "Rock" ]
-    , button [ onClick (const $ PlayerMove Paper) ] [ text "Paper" ]
-    , button [ onClick (const $ PlayerMove Scissors) ] [ text "Scissors" ]
-    , div [] [ text $ "Player choice: " ++ printMaybeChoice state.playerChoice ]
-    , div [] [ text $ "Computer choice: " ++ printMaybeChoice state.computerChoice ]
+    [ button [ onClick (const $ PlayerMove Rock), className "choice rock" ] [ text "Rock" ]
+    , button [ onClick (const $ PlayerMove Paper), className "choice paper"  ] [ text "Paper" ]
+    , button [ onClick (const $ PlayerMove Scissors), className "choice scissors"  ] [ text "Scissors" ]
+    , button [ onClick (const $ PlayerMove Lizard), className "choice lizard"  ] [ text "Lizard" ]
+    , button [ onClick (const $ PlayerMove Spock), className "choice spock"  ] [ text "Spock" ]
+    , hr [] []
+    , div [ className ("card " ++ toLower (printMaybeChoice state.playerChoice)) ] []
+    , div [ className ("card " ++ toLower (printMaybeChoice state.computerChoice)) ] []
     , div [] [ text $ "Game result: " ++ snd state.gameResult ]
     , div [] [ text $ "Score: " ++ show state.score ]
-    , button [ onClick (const Reset) ] [ text "Reset!" ]
+    , hr [] []
+    , button [ onClick (const Reset), className "reset" ] [ text "Reset!" ]
     ]
