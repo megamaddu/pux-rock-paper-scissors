@@ -35,7 +35,7 @@ view state =
   div
     []
     [ h1 [] [ a [ href "http://www.alexmingoia.com/purescript-pux/" ] [ text "Pux" ]
-            , text " Rock, Paper, Scissors!"
+            , text " Rock, Paper, Scissors, Lizard, Spock!"
             ]
     , case state.route of
         Home -> Child <$> Game.view state.game

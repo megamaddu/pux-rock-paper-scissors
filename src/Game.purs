@@ -1,6 +1,6 @@
 module App.Game where
 
-import Prelude (const, show, (++), ($), pure, bind, negate, (+))
+import Prelude (const, show, (++), ($), (<$>), (<*>), pure, bind, negate, (+))
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Random (RANDOM, randomInt)
@@ -14,6 +14,8 @@ data GameChoice
   = Rock
   | Paper
   | Scissors
+  | Lizard
+  | Spock
 
 data GameResult
   = PlayerWins
@@ -63,14 +65,11 @@ updateScore state =
 
 setGameResult :: State -> State
 setGameResult state =
-  case state.playerChoice, state.computerChoice of
-    Nothing, _ -> state
-    _, Nothing -> state
-    Just player, Just computer ->
-      case determineWinner player computer of
-        PlayerWins -> state { gameResult = Tuple 1 "Player wins!" }
-        ComputerWins -> state { gameResult = Tuple (-1) "Computer wins!" }
-        Tie -> state { gameResult = Tuple 0 "Tie!" }
+  case determineWinner <$> state.playerChoice <*> state.computerChoice of
+    Just PlayerWins -> state { gameResult = Tuple 1 "Player wins!" }
+    Just ComputerWins -> state { gameResult = Tuple (-1) "Computer wins!" }
+    Just Tie -> state { gameResult = Tuple 0 "Tie!" }
+    _ -> state
   where
     determineWinner player computer =
       if didLeftWin player computer
@@ -81,17 +80,26 @@ setGameResult state =
     didLeftWin left right =
       case left, right of
         Rock, Scissors -> true
+        Rock, Lizard -> true
         Paper, Rock -> true
+        Paper, Spock -> true
         Scissors, Paper -> true
+        Scissors, Lizard -> true
+        Lizard, Spock -> true
+        Lizard, Paper -> true
+        Spock, Scissors -> true
+        Spock, Rock -> true
         _, _ -> false
 
 getRandomChoice :: forall e. Eff (random :: RANDOM | e) GameChoice
 getRandomChoice = do
-  i <- randomInt 1 3
+  i <- randomInt 1 5
   pure case i of
     1 -> Rock
     2 -> Paper
-    _ -> Scissors
+    3 -> Scissors
+    4 -> Lizard
+    _ -> Spock
 
 printMaybeChoice :: Maybe GameChoice -> String
 printMaybeChoice Nothing = "-- choosing --"
@@ -100,6 +108,8 @@ printMaybeChoice (Just choice) = printChoice choice
     printChoice Rock = "Rock"
     printChoice Paper = "Paper"
     printChoice Scissors = "Scissors"
+    printChoice Lizard = "Lizard"
+    printChoice Spock = "Spock"
 
 view :: State -> Html Action
 view state =
@@ -108,6 +118,8 @@ view state =
     [ button [ onClick (const $ PlayerMove Rock) ] [ text "Rock" ]
     , button [ onClick (const $ PlayerMove Paper) ] [ text "Paper" ]
     , button [ onClick (const $ PlayerMove Scissors) ] [ text "Scissors" ]
+    , button [ onClick (const $ PlayerMove Lizard) ] [ text "Lizard" ]
+    , button [ onClick (const $ PlayerMove Spock) ] [ text "Spock" ]
     , div [] [ text $ "Player choice: " ++ printMaybeChoice state.playerChoice ]
     , div [] [ text $ "Computer choice: " ++ printMaybeChoice state.computerChoice ]
     , div [] [ text $ "Game result: " ++ snd state.gameResult ]
