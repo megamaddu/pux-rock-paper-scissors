@@ -9,8 +9,8 @@ Pux.
 ## Installation
 
 ```sh
-git clone git://github.com/alexmingoia/pux-starter-app.git example
-cd example
+git clone git://github.com/spicydonuts/pux-rock-paper-scissors.git
+cd pux-rock-paper-scissors
 npm install
 npm start
 ```
