@@ -1,6 +1,6 @@
 module App.Game where
 
-import Prelude (const, show, (++), ($), (<$>), (<*>), pure, bind, negate, (+))
+import Prelude (const, show, (<>), ($), (<$>), (<*>), pure, bind, negate, (+))
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Random (RANDOM, randomInt)
@@ -123,10 +123,10 @@ view state =
     , button [ onClick (const $ PlayerMove Lizard), className "choice lizard"  ] [ text "Lizard" ]
     , button [ onClick (const $ PlayerMove Spock), className "choice spock"  ] [ text "Spock" ]
     , hr [] []
-    , div [ className ("card " ++ toLower (printMaybeChoice state.playerChoice)) ] []
-    , div [ className ("card " ++ toLower (printMaybeChoice state.computerChoice)) ] []
-    , div [] [ text $ "Game result: " ++ snd state.gameResult ]
-    , div [] [ text $ "Score: " ++ show state.score ]
+    , div [ className ("card " <> toLower (printMaybeChoice state.playerChoice)) ] []
+    , div [ className ("card " <> toLower (printMaybeChoice state.computerChoice)) ] []
+    , div [] [ text $ "Game result: " <> snd state.gameResult ]
+    , div [] [ text $ "Score: " <> show state.score ]
     , hr [] []
     , button [ onClick (const Reset), className "reset" ] [ text "Reset!" ]
     ]

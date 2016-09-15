@@ -2,6 +2,7 @@ module App.Layout where
 
 import Prelude ((<$>), ($), (#))
 import App.Game as Game
+import App.NotFound as NotFound
 import App.Routes (Route(Home, NotFound))
 import Control.Monad.Eff.Random (RANDOM)
 import Pux (EffModel, noEffects, mapEffects, mapState)
@@ -39,5 +40,5 @@ view state =
             ]
     , case state.route of
         Home -> Child <$> Game.view state.game
-        NotFound -> App.NotFound.view state
+        NotFound -> NotFound.view state
     ]

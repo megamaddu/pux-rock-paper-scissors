@@ -1,9 +1,8 @@
 node_modules
 bower_components
 **DS_Store
-output
+output*
 dist
-.psci_modules
 npm-debug.log
-.psci
+.psc*
 .vscode
