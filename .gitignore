@@ -6,3 +6,4 @@ dist
 .psci_modules
 npm-debug.log
 .psci
+.vscode
