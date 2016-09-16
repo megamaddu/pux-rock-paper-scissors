@@ -58,7 +58,7 @@ update (PlayerMove choice) state =
   }
 update (ComputerMove choice) state =
   { state: state { computerChoice = Just choice }
-  , effects: [ pure $ UpdateScore ]
+  , effects: [ pure UpdateScore ]
   }
 
 updateScore :: State -> State
