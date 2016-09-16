@@ -21,8 +21,8 @@ data GameChoice
   | Spock
 
 data GameResult
-  = PlayerWins
-  | ComputerWins
+  = PlayerWins String
+  | ComputerWins String
   | Tie
 
 data Action
@@ -69,17 +69,22 @@ updateScore state =
 setGameResult :: State -> State
 setGameResult state =
   case determineWinner <$> state.playerChoice <*> state.computerChoice of
-    Just PlayerWins -> state { gameResult = 1 /\ "Player wins!" }
-    Just ComputerWins -> state { gameResult = -1 /\ "Computer wins!" }
-    Just Tie -> state { gameResult = 0 /\ "Tie!" }
+    Just (PlayerWins reason) -> state { gameResult = 1 /\ ("Player wins!  " <> reason <> "!") }
+    Just (ComputerWins reason) -> state { gameResult = -1 /\ ("Computer wins!  " <> reason <> "!") }
+    Just Tie -> state { gameResult = 0 /\ "It's a tie!" }
     _ -> state
   where
     determineWinner player computer =
-      if fst (didLeftWin player computer)
-        then PlayerWins
-        else if fst (didLeftWin computer player)
-          then ComputerWins
-          else Tie
+      let
+        didPlayerWin = didLeftWin player computer
+        didComputerWin = didLeftWin computer player
+      in 
+        if fst didPlayerWin
+          then PlayerWins (snd didPlayerWin)
+          else if fst (didLeftWin computer player)
+            then ComputerWins (snd didComputerWin)
+            else Tie
+
     didLeftWin left right =
       case left, right of
         Rock, Scissors -> true /\ "Rock crushes Scissors"
@@ -126,8 +131,8 @@ view state =
     , divider
     , showChoice state.playerChoice
     , showChoice state.computerChoice
-    , div [] [ text $ "Game result: " <> snd state.gameResult ]
-    , div [] [ text $ "Score: " <> show state.score ]
+    , showGameResult state.gameResult
+    , showPlayerScore state.score
     , divider
     , resetButton
     ]
@@ -140,5 +145,9 @@ view state =
     resetButton = button [ onClick (const Reset), className "reset" ] [ text "Reset!" ]
 
     showChoice gameChoice = div [ className ("card " <> toLower (printMaybeChoice gameChoice)) ] []
+
+    showGameResult gameResult = div [] [ text $ "Game result: " <> snd gameResult ]
+    
+    showPlayerScore playerScore = div [] [ text $ "Score: " <> show playerScore ]
 
     divider = hr [] []
