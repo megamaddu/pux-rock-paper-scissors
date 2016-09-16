@@ -16,7 +16,8 @@
     "watch": "npm run clean && node ./webpack.config.js",
     "serve": "http-server static --cors -p 3000",
     "start": "npm run watch",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "npm run clean & npm run build && surge -p static"
   },
   "repository": {
     "type": "git",
@@ -43,6 +44,7 @@
   },
   "devDependencies": {
     "source-map-loader": "^0.1.5",
+    "surge": "^0.18.0",
     "webpack-dev-middleware": "^1.6.1",
     "webpack-hot-middleware": "^2.10.0"
   }
