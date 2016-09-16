@@ -1,10 +1,10 @@
 module App.Game where
 
-import Prelude (const, show, (<>), ($), (<$>), (<*>), pure, bind, negate, (+))
+import Prelude (const, show, (<>), ($), (<$>), (<*>), pure, bind, negate, (+), (<<<))
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Random (RANDOM, randomInt)
-import Data.Maybe (Maybe(Just, Nothing))
+import Data.Maybe (Maybe(Just, Nothing), maybe)
 import Data.Tuple (snd, fst, Tuple(Tuple))
 import Data.Tuple.Nested ((/\))
 import Data.String (toLower)
@@ -110,24 +110,27 @@ getRandomChoice = do
     _ -> Spock
 
 printMaybeChoice :: Maybe GameChoice -> String
-printMaybeChoice Nothing = "-- choosing --"
-printMaybeChoice (Just choice) = printChoice choice
-  where
-    printChoice Rock = "Rock"
-    printChoice Paper = "Paper"
-    printChoice Scissors = "Scissors"
-    printChoice Lizard = "Lizard"
-    printChoice Spock = "Spock"
+printMaybeChoice = maybe "-- choosing --" printChoice
+
+printChoice :: GameChoice -> String
+printChoice Rock = "Rock"
+printChoice Paper = "Paper"
+printChoice Scissors = "Scissors"
+printChoice Lizard = "Lizard"
+printChoice Spock = "Spock"
+
+choiceToClassName :: GameChoice -> String
+choiceToClassName = toLower <<< printChoice
 
 view :: State -> Html Action
 view state =
   div
     []
-    [ choiceButton Rock "rock" "Rock"
-    , choiceButton Paper "paper" "Paper"
-    , choiceButton Scissors "scissors" "Scissors"
-    , choiceButton Lizard "lizard" "Lizard"
-    , choiceButton Spock "spock" "Spock"
+    [ choiceButton Rock
+    , choiceButton Paper
+    , choiceButton Scissors
+    , choiceButton Lizard
+    , choiceButton Spock
     , divider
     , showChoice state.playerChoice
     , showChoice state.computerChoice
@@ -137,14 +140,16 @@ view state =
     , resetButton
     ]
   where
-    choiceButton gameChoice choiceClass choiceText =
+    choiceButton gameChoice =
       button
-        [ onClick (const $ PlayerMove gameChoice), className ("choice " <> choiceClass) ]
-        [ text choiceText ]
+        [ onClick (const $ PlayerMove gameChoice), className ("choice " <> choiceToClassName gameChoice) ]
+        [ text $ printChoice gameChoice ]
 
     resetButton = button [ onClick (const Reset), className "reset" ] [ text "Reset!" ]
 
-    showChoice gameChoice = div [ className ("card " <> toLower (printMaybeChoice gameChoice)) ] []
+    showChoice maybeGameChoice = div [ className ("card " <> gameChoice) ] []
+      where
+        gameChoice = maybe "" choiceToClassName maybeGameChoice
 
     showGameResult gameResult = div [] [ text $ "Game result: " <> snd gameResult ]
     
