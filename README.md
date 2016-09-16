@@ -1,5 +1,7 @@
 # pux-rock-paper-scissors
 
+[Demo](https://pux-rock-paper-scissors.surge.sh/)
+
 Built on the [Pux Starter App](https://github.com/alexmingoia/pux-starter-app)
 using webpack with hot-reloading.
 
