@@ -6,10 +6,10 @@
   ],
   "description": "Starter Pux application using webpack with hot-reloading.",
   "main": "support/index.js",
-  "license": "Apache-2.0",
+  "license": "BSD3",
   "dependencies": {
-    "purescript-pux": "5.0.3",
-    "purescript-debug": "1.0.0",
-    "purescript-random": "1.0.0"
+    "purescript-pux": "^5.0.1",
+    "purescript-random": "^1.0.0",
+    "purescript-debug": "^1.0.0"
   }
 }

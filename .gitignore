@@ -1,8 +1,9 @@
-node_modules
-bower_components
-**DS_Store
-output*
-dist
-npm-debug.log
+node_modules/
+bower_components/
+output/
+dist/
+static/
+static/dist
 .psc*
-.vscode
+npm-debug.log
+**DS_Store

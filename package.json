@@ -1,5 +1,5 @@
 {
-  "name": "purescript-starter-app",
+  "name": "pux-starter-app",
   "version": "8.0.0",
   "description": "Starter Pux application using webpack with hot-reloading.",
   "main": "support/index.js",
@@ -11,22 +11,21 @@
   ],
   "scripts": {
     "postinstall": "bower cache clean && bower install",
-    "clean": "rimraf static/dist && rimraf dist && rimraf output_webpack",
+    "clean": "rimraf static/dist && rimraf dist && rimraf output",
     "build": "npm run clean && webpack --config ./webpack.production.config.js --progress --profile --colors",
     "watch": "npm run clean && node ./webpack.config.js",
     "serve": "http-server static --cors -p 3000",
     "start": "npm run watch",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy": "npm run clean & npm run build && surge -p static"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/spicydonuts/pux-rock-paper-scissors.git"
+    "url": "git://github.com/alexmingoia/pux-starter-app.git"
   },
-  "author": "Michael Trotter",
+  "author": "Alexander C. Mingoia",
   "license": "BSD-3-Clause",
   "bugs": {
-    "url": "https://github.com/spicydonuts/pux-rock-paper-scissors/issues"
+    "url": "https://github.com/alexmingoia/pux-starter-app/issues"
   },
   "dependencies": {
     "bower": "^1.7.9",
@@ -40,12 +39,10 @@
     "react": "^15.0.0",
     "react-dom": "^15.0.0",
     "rimraf": "^2.5.2",
-    "spectacle": "^1.1.2",
     "webpack": "^1.12.14"
   },
   "devDependencies": {
     "source-map-loader": "^0.1.5",
-    "surge": "^0.18.0",
     "webpack-dev-middleware": "^1.6.1",
     "webpack-hot-middleware": "^2.10.0"
   }

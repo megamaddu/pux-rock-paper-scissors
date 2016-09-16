@@ -27,8 +27,7 @@ var config = {
           psc: 'psa',
           pscArgs: {
             sourceMaps: true
-          },
-          output: 'output_webpack'
+          }
         }
       }
     ],

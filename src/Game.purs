@@ -117,16 +117,27 @@ view :: State -> Html Action
 view state =
   div
     []
-    [ button [ onClick (const $ PlayerMove Rock), className "choice rock" ] [ text "Rock" ]
-    , button [ onClick (const $ PlayerMove Paper), className "choice paper"  ] [ text "Paper" ]
-    , button [ onClick (const $ PlayerMove Scissors), className "choice scissors"  ] [ text "Scissors" ]
-    , button [ onClick (const $ PlayerMove Lizard), className "choice lizard"  ] [ text "Lizard" ]
-    , button [ onClick (const $ PlayerMove Spock), className "choice spock"  ] [ text "Spock" ]
-    , hr [] []
-    , div [ className ("card " <> toLower (printMaybeChoice state.playerChoice)) ] []
-    , div [ className ("card " <> toLower (printMaybeChoice state.computerChoice)) ] []
+    [ choiceButton Rock "rock" "Rock"
+    , choiceButton Paper "paper" "Paper"
+    , choiceButton Scissors "scissors" "Scissors"
+    , choiceButton Lizard "lizard" "Lizard"
+    , choiceButton Spock "spock" "Spock"
+    , divider
+    , showChoice state.playerChoice
+    , showChoice state.computerChoice
     , div [] [ text $ "Game result: " <> snd state.gameResult ]
     , div [] [ text $ "Score: " <> show state.score ]
-    , hr [] []
-    , button [ onClick (const Reset), className "reset" ] [ text "Reset!" ]
+    , divider
+    , resetButton
     ]
+  where
+    choiceButton gameChoice choiceClass choiceText =
+      button
+        [ onClick (const $ PlayerMove gameChoice), className ("choice " <> choiceClass) ]
+        [ text choiceText ]
+
+    resetButton = button [ onClick (const Reset), className "reset" ] [ text "Reset!" ]
+
+    showChoice gameChoice = div [ className ("card " <> toLower (printMaybeChoice gameChoice)) ] []
+
+    divider = hr [] []
