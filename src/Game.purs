@@ -6,6 +6,7 @@ import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Random (RANDOM, randomInt)
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Tuple (snd, fst, Tuple(Tuple))
+import Data.Tuple.Nested ((/\))
 import Data.String (toLower)
 import Pux (EffModel, noEffects)
 import Pux.Html (Html, text, button, div, hr)
@@ -68,9 +69,9 @@ updateScore state =
 setGameResult :: State -> State
 setGameResult state =
   case determineWinner <$> state.playerChoice <*> state.computerChoice of
-    Just PlayerWins -> state { gameResult = Tuple 1 "Player wins!" }
-    Just ComputerWins -> state { gameResult = Tuple (-1) "Computer wins!" }
-    Just Tie -> state { gameResult = Tuple 0 "Tie!" }
+    Just PlayerWins -> state { gameResult = 1 /\ "Player wins!" }
+    Just ComputerWins -> state { gameResult = -1 /\ "Computer wins!" }
+    Just Tie -> state { gameResult = 0 /\ "Tie!" }
     _ -> state
   where
     determineWinner player computer =
@@ -81,17 +82,17 @@ setGameResult state =
           else Tie
     didLeftWin left right =
       case left, right of
-        Rock, Scissors -> Tuple true "Rock crushes Scissors"
-        Rock, Lizard -> Tuple true "Rock smashes Lizard"
-        Paper, Rock -> Tuple true "Paper covers Rock"
-        Paper, Spock -> Tuple true "Paper disproves Spock"
-        Scissors, Paper -> Tuple true "Scissors cuts Paper"
-        Scissors, Lizard -> Tuple true "Scissors decapitates Lizard"
-        Lizard, Paper -> Tuple true "Lizard eats Paper"
-        Lizard, Spock -> Tuple true "Lizard poisons Spock"
-        Spock, Rock -> Tuple true "Spock vaporizes Rock"
-        Spock, Scissors -> Tuple true "Spock disassembles Scissors"
-        _, _ -> Tuple false "loss"
+        Rock, Scissors -> true /\ "Rock crushes Scissors"
+        Rock, Lizard -> true /\ "Rock smashes Lizard"
+        Paper, Rock -> true /\ "Paper covers Rock"
+        Paper, Spock -> true /\ "Paper disproves Spock"
+        Scissors, Paper -> true /\ "Scissors cuts Paper"
+        Scissors, Lizard -> true /\ "Scissors decapitates Lizard"
+        Lizard, Paper -> true /\ "Lizard eats Paper"
+        Lizard, Spock -> true /\ "Lizard poisons Spock"
+        Spock, Rock -> true /\ "Spock vaporizes Rock"
+        Spock, Scissors -> true /\ "Spock disassembles Scissors"
+        _, _ -> false /\ "loss"
 
 getRandomChoice :: forall e. Eff (random :: RANDOM | e) GameChoice
 getRandomChoice = do
