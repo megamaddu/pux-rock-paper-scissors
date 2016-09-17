@@ -3,7 +3,7 @@ bower_components/
 output/
 dist/
 static/
-static/dist
+.vscode/
 .psc*
 npm-debug.log
 **DS_Store

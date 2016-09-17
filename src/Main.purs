@@ -1,13 +1,13 @@
 module Main where
 
-import App.Layout (Action(PageView), State, view, update)
+import App.Layout (State, Action(PageView), view, update)
 import App.Routes (match)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Random (RANDOM)
 import DOM (DOM)
-import Debug.Trace (traceAny)
-import Prelude (bind, pure)
-import Pux (App, CoreEffects, renderToDOM, start)
+import Prelude (bind, pure, (=<<), (<<<))
+import Pux (App, CoreEffects, Config, Update, renderToDOM, start)
+import Pux.Devtool (Action, start) as Pux.Devtool
 import Pux.Router (sampleUrl)
 import Signal ((~>))
 
@@ -16,24 +16,34 @@ type AppEffects =
   , random :: RANDOM
   )
 
--- | Entry point for the browser.
-main :: State -> Eff (CoreEffects AppEffects) (App State Action)
-main state = do
+-- | App configuration
+config :: forall e. State -> Eff (dom :: DOM | e) (Config State Action AppEffects)
+config state = do
   -- | Create a signal of URL changes.
   urlSignal <- sampleUrl
 
   -- | Map a signal of URL changes to PageView actions.
-  let routeSignal = urlSignal ~> \r -> PageView (match r)
+  let routeSignal = urlSignal ~> PageView <<< match
 
-  app <- start
+  pure
     { initialState: state
-    , update:
-        -- | Logs all actions and states (removed in production builds).
-        (\a s -> traceAny {action: a, state: s} (\_ -> update a s))
-    , view: view
-    , inputs: [routeSignal] }
+    , update: update :: Update State Action AppEffects
+    , view
+    , inputs: [ routeSignal ]
+    }
 
+-- | Entry point for the browser.
+main :: State -> Eff (CoreEffects AppEffects) (App State Action)
+main state = do
+  app <- start =<< config state
   renderToDOM "#app" app.html
+  -- | Used by hot-reloading code in support/index.js
+  pure app
 
+-- | Entry point for the browser with pux-devtool injected.
+debug :: State -> Eff (CoreEffects AppEffects) (App State (Pux.Devtool.Action Action))
+debug state = do
+  app <- Pux.Devtool.start =<< config state
+  renderToDOM "#app" app.html
   -- | Used by hot-reloading code in support/index.js
   pure app
