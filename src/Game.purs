@@ -32,8 +32,8 @@ data Action
   | Reset
 
 type State =
-  { playerChoice :: (Maybe GameChoice)
-  , computerChoice :: (Maybe GameChoice)
+  { playerChoice :: Maybe GameChoice
+  , computerChoice :: Maybe GameChoice
   , gameResult :: Tuple Int String
   , score :: Int
   }
@@ -78,7 +78,7 @@ setGameResult state =
       let
         didPlayerWin = didLeftWin player computer
         didComputerWin = didLeftWin computer player
-      in 
+      in
         if fst didPlayerWin
           then PlayerWins (snd didPlayerWin)
           else if fst (didLeftWin computer player)
@@ -152,7 +152,7 @@ view state =
         gameChoice = maybe "" choiceToClassName maybeGameChoice
 
     showGameResult gameResult = div [] [ text $ "Game result: " <> snd gameResult ]
-    
+
     showPlayerScore playerScore = div [] [ text $ "Score: " <> show playerScore ]
 
     divider = hr [] []
